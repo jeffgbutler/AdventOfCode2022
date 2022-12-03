@@ -2,7 +2,6 @@ package Day02
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"strings"
 )
@@ -11,15 +10,17 @@ type PlayOption int
 type Outcome int
 
 const (
-	Rock     PlayOption = 1
-	Paper               = 2
-	Scissors            = 3
+	UnknownPlay PlayOption = -1
+	Rock                   = 1
+	Paper                  = 2
+	Scissors               = 3
 )
 
 const (
-	Win  Outcome = 6
-	Lose         = 0
-	Draw         = 3
+	UnknownOutcome Outcome = -1
+	Win                    = 6
+	Lose                   = 0
+	Draw                   = 3
 )
 
 type round struct {
@@ -27,132 +28,87 @@ type round struct {
 	myPlay       PlayOption
 }
 
-func readInputFilePart1(f string) ([]round, error) {
-	var lines []round
-	file, err := os.Open(f)
-	if err != nil {
-		return lines, err
-	}
+func readInputFilePart1(f string) []round {
+	var rounds []round
+	file, _ := os.Open(f)
 	defer file.Close()
 
-	bufScanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(file)
 
-	for bufScanner.Scan() {
-		line := bufScanner.Text()
-		s := strings.Fields(line)
-		r, err := translatePart1(s)
-		if err != nil {
-			return lines, err
-		}
-		lines = append(lines, r)
+	for scanner.Scan() {
+		line := scanner.Text()
+		fields := strings.Fields(line)
+		rounds = append(rounds, calculateRoundPart1(fields))
 	}
 
-	return lines, bufScanner.Err()
+	return rounds
 }
 
-func readInputFilePart2(f string) ([]round, error) {
-	var lines []round
-	file, err := os.Open(f)
-	if err != nil {
-		return lines, err
-	}
+func readInputFilePart2(f string) []round {
+	var rounds []round
+	file, _ := os.Open(f)
 	defer file.Close()
 
-	bufScanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(file)
 
-	for bufScanner.Scan() {
-		line := bufScanner.Text()
-		s := strings.Fields(line)
-		r, err := translatePart2(s)
-		if err != nil {
-			return lines, err
-		}
-		lines = append(lines, r)
+	for scanner.Scan() {
+		line := scanner.Text()
+		fields := strings.Fields(line)
+		rounds = append(rounds, calculateRoundPart2(fields))
 	}
 
-	return lines, bufScanner.Err()
+	return rounds
 }
 
-func translatePart1(someRound []string) (round, error) {
-	opponentPlay, err := translatePlay(someRound[0])
-	if err != nil {
-		return round{}, err
-	}
-
-	myPlay, err := translatePlay(someRound[1])
-	if err != nil {
-		return round{}, err
-	}
-
-	theRound := round{opponentPlay, myPlay}
-	return theRound, nil
+func calculateRoundPart1(someRound []string) round {
+	return round{translatePlay(someRound[0]), translatePlay(someRound[1])}
 }
 
-func translatePart2(someRound []string) (round, error) {
-	opponentPlay, err := translatePlay(someRound[0])
-	if err != nil {
-		return round{Rock, Rock}, err
-	}
-
-	myPlay, err := translateMyPlayPart2(opponentPlay, someRound[1])
-	if err != nil {
-		return round{}, err
-	}
-
-	theRound := round{opponentPlay, myPlay}
-	return theRound, nil
+func calculateRoundPart2(someRound []string) round {
+	opponentPlay := translatePlay(someRound[0])
+	return round{opponentPlay, translateMyPlayPart2(opponentPlay, someRound[1])}
 }
 
-func calculateMatchOutcome(inputs []round) (int, error) {
+func calculateMatchOutcome(inputs []round) int {
 	total := 0
 	for _, someRound := range inputs {
-		roundValue, err := calculateRoundValue(someRound)
-		if err != nil {
-			return 0, err
-		}
-
-		total += roundValue
+		total += calculateRoundValue(someRound)
 	}
 
-	return total, nil
+	return total
 }
 
-func translatePlay(play string) (PlayOption, error) {
+func translatePlay(play string) PlayOption {
 	switch play {
 	case "A", "X":
-		return Rock, nil
+		return Rock
 	case "B", "Y":
-		return Paper, nil
+		return Paper
 	case "C", "Z":
-		return Scissors, nil
+		return Scissors
 	default:
-		return 0, fmt.Errorf("unexpected PlayOption %s", play)
+		return UnknownPlay
 	}
 }
 
-func translateMyPlayPart2(opponentPlay PlayOption, myPlay string) (PlayOption, error) {
+func translateMyPlayPart2(opponentPlay PlayOption, myPlay string) PlayOption {
 	switch myPlay {
 	case "X": // lose
 		return findLosePlay(opponentPlay)
 	case "Y": // draw
-		return opponentPlay, nil
+		return opponentPlay
 	case "Z": // win
 		return findWinPlay(opponentPlay)
 	default:
-		return Rock, fmt.Errorf("unexpected PlayOption %s", myPlay)
+		return UnknownPlay
 	}
 }
 
-func calculateRoundValue(theRound round) (int, error) {
-	outcome, err := calculateOutCome(theRound)
-	if err != nil {
-		return 0, err
-	}
-
-	return int(outcome) + int(theRound.myPlay), nil
+func calculateRoundValue(theRound round) int {
+	return int(calculateOutCome(theRound)) + int(theRound.myPlay)
 }
 
-func calculateOutCome(theRound round) (Outcome, error) {
+func calculateOutCome(theRound round) Outcome {
 	switch theRound.opponentPlay {
 	case Rock:
 		return outcomeVsRock(theRound.myPlay)
@@ -161,71 +117,71 @@ func calculateOutCome(theRound round) (Outcome, error) {
 	case Scissors:
 		return outcomeVsScissors(theRound.myPlay)
 	default:
-		return 0, fmt.Errorf("unexpected PlayOption %d", int(theRound.opponentPlay))
+		return UnknownOutcome
 	}
 }
 
-func outcomeVsRock(myPlay PlayOption) (Outcome, error) {
+func outcomeVsRock(myPlay PlayOption) Outcome {
 	switch myPlay {
 	case Rock:
-		return Draw, nil
+		return Draw
 	case Paper:
-		return Win, nil
+		return Win
 	case Scissors:
-		return Lose, nil
+		return Lose
 	default:
-		return 0, fmt.Errorf("unexpected PlayOption %d", int(myPlay))
+		return UnknownOutcome
 	}
 }
 
-func outcomeVsPaper(myPlay PlayOption) (Outcome, error) {
+func outcomeVsPaper(myPlay PlayOption) Outcome {
 	switch myPlay {
 	case Rock:
-		return Lose, nil
+		return Lose
 	case Paper:
-		return Draw, nil
+		return Draw
 	case Scissors:
-		return Win, nil
+		return Win
 	default:
-		return 0, fmt.Errorf("unexpected PlayOption %d", int(myPlay))
+		return UnknownOutcome
 	}
 }
 
-func outcomeVsScissors(myPlay PlayOption) (Outcome, error) {
+func outcomeVsScissors(myPlay PlayOption) Outcome {
 	switch myPlay {
 	case Rock:
-		return Win, nil
+		return Win
 	case Paper:
-		return Lose, nil
+		return Lose
 	case Scissors:
-		return Draw, nil
+		return Draw
 	default:
-		return 0, fmt.Errorf("unexpected PlayOption %d", int(myPlay))
+		return UnknownOutcome
 	}
 }
 
-func findLosePlay(opponentPlay PlayOption) (PlayOption, error) {
+func findLosePlay(opponentPlay PlayOption) PlayOption {
 	switch opponentPlay {
 	case Rock:
-		return Scissors, nil
+		return Scissors
 	case Paper:
-		return Rock, nil
+		return Rock
 	case Scissors:
-		return Paper, nil
+		return Paper
 	default:
-		return 0, fmt.Errorf("unexpected PlayOption %d", int(opponentPlay))
+		return UnknownPlay
 	}
 }
 
-func findWinPlay(opponentPlay PlayOption) (PlayOption, error) {
+func findWinPlay(opponentPlay PlayOption) PlayOption {
 	switch opponentPlay {
 	case Rock:
-		return Paper, nil
+		return Paper
 	case Paper:
-		return Scissors, nil
+		return Scissors
 	case Scissors:
-		return Rock, nil
+		return Rock
 	default:
-		return 0, fmt.Errorf("unexpected PlayOption %d", int(opponentPlay))
+		return UnknownPlay
 	}
 }
