@@ -1,11 +1,14 @@
 package Day02
 
-import "testing"
+import (
+	"AdventOfCode2022/inputfile"
+	"testing"
+)
 
 func Test_Part1WithExampleData(t *testing.T) {
 
-	rounds := readInputFilePart1("testdata/example.txt")
-
+	inputLines, _ := inputfile.Read("testdata/example.txt")
+	rounds := convertToRoundsPart1(inputLines)
 	total := calculateMatchOutcome(rounds)
 
 	if total != 15 {
@@ -15,8 +18,8 @@ func Test_Part1WithExampleData(t *testing.T) {
 
 func Test_Part1WithRealData(t *testing.T) {
 
-	rounds := readInputFilePart1("testdata/mydata.txt")
-
+	inputLines, _ := inputfile.Read("testdata/mydata.txt")
+	rounds := convertToRoundsPart1(inputLines)
 	total := calculateMatchOutcome(rounds)
 
 	if total != 14297 {
@@ -26,8 +29,8 @@ func Test_Part1WithRealData(t *testing.T) {
 
 func Test_Part2WithExampleData(t *testing.T) {
 
-	rounds := readInputFilePart2("testdata/example.txt")
-
+	inputLines, _ := inputfile.Read("testdata/example.txt")
+	rounds := convertToRoundsPart2(inputLines)
 	total := calculateMatchOutcome(rounds)
 
 	if total != 12 {
@@ -37,8 +40,8 @@ func Test_Part2WithExampleData(t *testing.T) {
 
 func Test_Part2WithRealData(t *testing.T) {
 
-	rounds := readInputFilePart2("testdata/mydata.txt")
-
+	inputLines, _ := inputfile.Read("testdata/mydata.txt")
+	rounds := convertToRoundsPart2(inputLines)
 	total := calculateMatchOutcome(rounds)
 
 	if total != 10498 {

@@ -1,9 +1,12 @@
 package Day01
 
-import "testing"
+import (
+	"AdventOfCode2022/inputfile"
+	"testing"
+)
 
 func Test_readInputFile(t *testing.T) {
-	lines, err := readInputFile("testdata/example.txt")
+	lines, err := inputfile.Read("testdata/example.txt")
 
 	if err != nil {
 		t.Fatal(err)
@@ -15,7 +18,7 @@ func Test_readInputFile(t *testing.T) {
 }
 
 func Test_Converter(t *testing.T) {
-	lines, err := readInputFile("testdata/example.txt")
+	lines, err := inputfile.Read("testdata/example.txt")
 
 	if err != nil {
 		t.Fatal(err)
@@ -33,7 +36,7 @@ func Test_Converter(t *testing.T) {
 }
 
 func Test_findGreatestElfWithExampleData(t *testing.T) {
-	lines, err := readInputFile("testdata/example.txt")
+	lines, err := inputfile.Read("testdata/example.txt")
 
 	if err != nil {
 		t.Fatal(err)
@@ -53,7 +56,7 @@ func Test_findGreatestElfWithExampleData(t *testing.T) {
 }
 
 func Test_findGreatestElfWithActualData(t *testing.T) {
-	lines, err := readInputFile("testdata/mydata.txt")
+	lines, err := inputfile.Read("testdata/mydata.txt")
 
 	if err != nil {
 		t.Fatal(err)
@@ -73,7 +76,7 @@ func Test_findGreatestElfWithActualData(t *testing.T) {
 }
 
 func Test_findTopThreeElvesWithExampleData(t *testing.T) {
-	lines, err := readInputFile("testdata/example.txt")
+	lines, err := inputfile.Read("testdata/example.txt")
 
 	if err != nil {
 		t.Fatal(err)
@@ -100,7 +103,7 @@ func Test_findTopThreeElvesWithExampleData(t *testing.T) {
 }
 
 func Test_findTopThreeElvesWithActualData(t *testing.T) {
-	lines, err := readInputFile("testdata/mydata.txt")
+	lines, err := inputfile.Read("testdata/mydata.txt")
 
 	if err != nil {
 		t.Fatal(err)

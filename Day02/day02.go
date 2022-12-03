@@ -1,8 +1,6 @@
 package Day02
 
 import (
-	"bufio"
-	"os"
 	"strings"
 )
 
@@ -28,35 +26,21 @@ type round struct {
 	myPlay       PlayOption
 }
 
-func readInputFilePart1(f string) []round {
+func convertToRoundsPart1(inputLines []string) []round {
 	var rounds []round
-	file, _ := os.Open(f)
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		fields := strings.Fields(line)
+	for _, inputLine := range inputLines {
+		fields := strings.Fields(inputLine)
 		rounds = append(rounds, calculateRoundPart1(fields))
 	}
-
 	return rounds
 }
 
-func readInputFilePart2(f string) []round {
+func convertToRoundsPart2(inputLines []string) []round {
 	var rounds []round
-	file, _ := os.Open(f)
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		fields := strings.Fields(line)
+	for _, inputLine := range inputLines {
+		fields := strings.Fields(inputLine)
 		rounds = append(rounds, calculateRoundPart2(fields))
 	}
-
 	return rounds
 }
 
