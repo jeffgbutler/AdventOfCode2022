@@ -51,3 +51,29 @@ func calculateLetterValue(r rune) int {
 		return val - int('A') + 27
 	}
 }
+
+func calculateGroupPriorityTotal(inputLines []string) (int, int) {
+	total := 0
+	groups := 0
+	for {
+		if len(inputLines) < 3 {
+			break
+		}
+		groups++
+
+		total += calculateGroupPriority(inputLines[0], inputLines[1], inputLines[2])
+		inputLines = inputLines[3:]
+	}
+
+	return groups, total
+}
+
+func calculateGroupPriority(line1, line2, line3 string) int {
+	for _, v := range line1 {
+		if strings.ContainsRune(line2, v) && strings.ContainsRune(line3, v) {
+			return calculateLetterValue(v)
+		}
+	}
+
+	return -1
+}

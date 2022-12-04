@@ -25,6 +25,32 @@ func Test_Part1ActualData(t *testing.T) {
 	}
 }
 
+func Test_Part2ExampleData(t *testing.T) {
+	inputLines, _ := inputfile.Read("testdata/example.txt")
+	groups, total := calculateGroupPriorityTotal(inputLines)
+
+	if groups != 2 {
+		t.Error("Expected 2 groups, got", groups)
+	}
+
+	if total != 70 {
+		t.Error("Expected 70, got", total)
+	}
+}
+
+func Test_Part2ActualData(t *testing.T) {
+	inputLines, _ := inputfile.Read("testdata/actual.txt")
+	groups, total := calculateGroupPriorityTotal(inputLines)
+
+	if groups != 100 {
+		t.Error("Expected 100 groups, got", groups)
+	}
+
+	if total != 2515 {
+		t.Error("Expected 2515, got", total)
+	}
+}
+
 func Test_CalculateValue_a(t *testing.T) {
 	value := calculateLetterValue('a')
 
