@@ -56,7 +56,7 @@ func Test_findGreatestElfWithExampleData(t *testing.T) {
 }
 
 func Test_findGreatestElfWithActualData(t *testing.T) {
-	lines, err := inputfile.Read("testdata/mydata.txt")
+	lines, err := inputfile.Read("testdata/actual.txt")
 
 	if err != nil {
 		t.Fatal(err)
@@ -103,7 +103,7 @@ func Test_findTopThreeElvesWithExampleData(t *testing.T) {
 }
 
 func Test_findTopThreeElvesWithActualData(t *testing.T) {
-	lines, err := inputfile.Read("testdata/mydata.txt")
+	lines, err := inputfile.Read("testdata/actual.txt")
 
 	if err != nil {
 		t.Fatal(err)

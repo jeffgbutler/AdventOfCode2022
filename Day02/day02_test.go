@@ -16,9 +16,9 @@ func Test_Part1WithExampleData(t *testing.T) {
 	}
 }
 
-func Test_Part1WithRealData(t *testing.T) {
+func Test_Part1WithActualData(t *testing.T) {
 
-	inputLines, _ := inputfile.Read("testdata/mydata.txt")
+	inputLines, _ := inputfile.Read("testdata/actual.txt")
 	rounds := convertToRoundsPart1(inputLines)
 	total := calculateMatchOutcome(rounds)
 
@@ -38,9 +38,9 @@ func Test_Part2WithExampleData(t *testing.T) {
 	}
 }
 
-func Test_Part2WithRealData(t *testing.T) {
+func Test_Part2WithActualData(t *testing.T) {
 
-	inputLines, _ := inputfile.Read("testdata/mydata.txt")
+	inputLines, _ := inputfile.Read("testdata/actual.txt")
 	rounds := convertToRoundsPart2(inputLines)
 	total := calculateMatchOutcome(rounds)
 
