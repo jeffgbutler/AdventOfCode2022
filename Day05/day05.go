@@ -1,8 +1,8 @@
 package Day05
 
 import (
-	"AdventOfCode2022/datastructures"
-	"AdventOfCode2022/functions"
+	"github.com/jeffgbutler/AdventOfCode2022/datastructures"
+	"github.com/jeffgbutler/AdventOfCode2022/functions"
 	"strconv"
 	"strings"
 )

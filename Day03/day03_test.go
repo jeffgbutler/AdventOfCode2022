@@ -1,7 +1,7 @@
 package Day03
 
 import (
-	"AdventOfCode2022/inputfile"
+	"github.com/jeffgbutler/AdventOfCode2022/inputfile"
 	"testing"
 )
 

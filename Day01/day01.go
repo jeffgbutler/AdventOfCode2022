@@ -1,7 +1,7 @@
 package Day01
 
 import (
-	"AdventOfCode2022/functions"
+	"github.com/jeffgbutler/AdventOfCode2022/functions"
 	"sort"
 	"strconv"
 )
