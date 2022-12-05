@@ -1,6 +1,7 @@
 package Day01
 
 import (
+	"AdventOfCode2022/functions"
 	"sort"
 	"strconv"
 )
@@ -68,10 +69,6 @@ func compareElfSlices(a, b []elf) bool {
 }
 
 func calculateTotalCalories(elves []elf) int {
-	total := 0
-	for _, e := range elves {
-		total += e.calories
-	}
-
-	return total
+	cals := functions.Map(elves, func(e elf) int { return e.calories })
+	return functions.Reduce(cals, 0, func(i1, i2 int) int { return i1 + i2 })
 }
