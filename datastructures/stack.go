@@ -11,15 +11,12 @@ func (ps *Stack[T]) Push(t T) {
 }
 
 func (ps *Stack[T]) Pop() (T, bool) {
-	length := len(ps.values)
-	if length == 0 {
-		var zero T
-		return zero, false
+	value, valid := ps.Peek()
+	if valid {
+		ps.values = ps.values[:len(ps.values)-1]
 	}
 
-	v := ps.values[length-1]
-	ps.values = ps.values[:length-1]
-	return v, true
+	return value, valid
 }
 
 func (ps *Stack[T]) Peek() (T, bool) {
