@@ -62,6 +62,9 @@ func eitherRangeOverlaps(ranges doubleRange) bool {
 }
 
 func rangeOverlaps(range1, range2 singleRange) bool {
-	return (range1.start >= range2.start && range1.start <= range2.end) ||
-		(range1.end >= range2.start && range1.end <= range2.end)
+	return inRange(range1.start, range2) || inRange(range1.end, range2)
+}
+
+func inRange(i int, r singleRange) bool {
+	return i >= r.start && i <= r.end
 }
