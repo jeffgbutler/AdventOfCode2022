@@ -2,6 +2,7 @@ package Day05
 
 import (
 	"AdventOfCode2022/datastructures"
+	"AdventOfCode2022/functions"
 	"strconv"
 	"strings"
 )
@@ -11,43 +12,20 @@ type move struct {
 }
 
 func part1(inputLines []string) string {
-
 	stacks, moves := parseInputFile(inputLines)
-
 	processMovesPart1(stacks, moves)
-
-	var answer string
-	for i := 0; i < len(stacks); i++ {
-		r, valid := stacks[i].Peek()
-		if valid {
-			answer += r
-		}
-	}
-
-	return answer
+	return buildAnswer(stacks)
 }
 
 func part2(inputLines []string) string {
-
 	stacks, moves := parseInputFile(inputLines)
-
 	processMovesPart2(stacks, moves)
-
-	var answer string
-	for i := 0; i < len(stacks); i++ {
-		r, valid := stacks[i].Peek()
-		if valid {
-			answer += r
-		}
-	}
-
-	return answer
+	return buildAnswer(stacks)
 }
 
 func parseInputFile(inputLines []string) ([]datastructures.Stack[string], []move) {
-	var stacks []datastructures.Stack[string]
-	stacks, inputLines = parseStackLines(inputLines)
-	moves := parseMoveLines(inputLines)
+	stacks, lines := parseStackLines(inputLines)
+	moves := parseMoveLines(lines)
 
 	return stacks, moves
 }
@@ -69,26 +47,30 @@ func processMovesPart2(stacks []datastructures.Stack[string], moves []move) {
 }
 
 func parseStackLines(inputLines []string) ([]datastructures.Stack[string], []string) {
-	// save initial stack lines
+	lines := inputLines
+
+	// save initial stack lines in a stack - we need to process in reverse
 	var stackLines datastructures.Stack[string]
 
+	// find the initial stack configuration lines
 	for {
-		currentLine := inputLines[0]
+		currentLine := lines[0]
 		if strings.ContainsRune(currentLine, '[') {
 			stackLines.Push(currentLine)
-			inputLines = inputLines[1:]
+			lines = lines[1:]
 		} else {
 			break
 		}
 	}
 
 	// input lines now pointing to the number of stacks
-	currentLine := inputLines[0]
-	inputLines = inputLines[1:]
+	currentLine := lines[0]
+	lines = lines[1:]
 	s := strings.Fields(currentLine)
 	numberOfStacks, _ := strconv.Atoi(s[len(s)-1])
 	stacks := make([]datastructures.Stack[string], numberOfStacks)
 
+	// we now know the number of stack, we can process the stack definitions in reverse order
 	var stackLine string
 	var valid bool
 	for {
@@ -100,10 +82,12 @@ func parseStackLines(inputLines []string) ([]datastructures.Stack[string], []str
 		}
 	}
 
-	return stacks, inputLines[1:]
+	// skip blank line, so we're now positioned at the moves
+	return stacks, lines[1:]
 }
 
 func populateStack(inputLine string, stacks []datastructures.Stack[string]) {
+	// this will fail if there are more than 9 stacks
 	for i := 0; (i*4)+1 < len(inputLine); i++ {
 		offset := (i * 4) + 1
 		if inputLine[offset] != ' ' {
@@ -124,4 +108,15 @@ func parseMoveLines(inputLines []string) []move {
 	}
 
 	return moves
+}
+
+func buildAnswer(stacks []datastructures.Stack[string]) string {
+	// build a string from the top element of each stack
+	return functions.Reduce(stacks, "", func(s string, stack datastructures.Stack[string]) string {
+		value, valid := stack.Peek()
+		if valid {
+			s += value
+		}
+		return s
+	})
 }
