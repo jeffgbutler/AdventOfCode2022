@@ -6,40 +6,40 @@ type Stack[T any] struct {
 	values []T
 }
 
-func (ps *Stack[T]) Push(t T) {
-	ps.values = append(ps.values, t)
+func (s *Stack[T]) Push(t T) {
+	s.values = append(s.values, t)
 }
 
-func (ps *Stack[T]) PushMultiple(t []T) {
-	ps.values = append(ps.values, t...)
+func (s *Stack[T]) PushMultiple(t []T) {
+	s.values = append(s.values, t...)
 }
 
-func (ps *Stack[T]) Pop() (T, bool) {
-	value, valid := ps.Peek()
+func (s *Stack[T]) Pop() (T, bool) {
+	value, valid := s.Peek()
 	if valid {
-		ps.values = ps.values[:len(ps.values)-1]
+		s.values = s.values[:len(s.values)-1]
 	}
 
 	return value, valid
 }
 
-func (ps *Stack[T]) PopMultiple(i int) ([]T, bool) {
-	if i > len(ps.values) {
+func (s *Stack[T]) PopMultiple(i int) ([]T, bool) {
+	if i > len(s.values) {
 		return nil, false
 	}
 
-	values := ps.values[len(ps.values)-i:]
-	ps.values = ps.values[:len(ps.values)-i]
+	values := s.values[len(s.values)-i:]
+	s.values = s.values[:len(s.values)-i]
 
 	return values, true
 }
 
-func (ps *Stack[T]) Peek() (T, bool) {
-	length := len(ps.values)
+func (s *Stack[T]) Peek() (T, bool) {
+	length := len(s.values)
 	if length == 0 {
 		var zero T
 		return zero, false
 	}
 
-	return ps.values[length-1], true
+	return s.values[length-1], true
 }
