@@ -48,3 +48,28 @@ func Test_Stack(t *testing.T) {
 		t.Error("Expected invalid Peek")
 	}
 }
+
+func Test_MultipleStack(t *testing.T) {
+	var myStack, newStack Stack[string]
+	var myValues []string
+	var myValue string
+	var valid bool
+
+	myStack.Push("A")
+	myStack.Push("B")
+	myStack.Push("C")
+	myStack.Push("D")
+	myStack.Push("E")
+
+	myValues, valid = myStack.PopMultiple(3)
+	if valid && len(myValues) != 3 {
+		t.Error("Expected three, got", len(myValues))
+	}
+
+	newStack.PushMultiple(myValues)
+
+	myValue, valid = newStack.Pop()
+	if valid && myValue != "E" {
+		t.Error("Expected E, got", myValue)
+	}
+}

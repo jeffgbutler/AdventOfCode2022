@@ -10,6 +10,10 @@ func (ps *Stack[T]) Push(t T) {
 	ps.values = append(ps.values, t)
 }
 
+func (ps *Stack[T]) PushMultiple(t []T) {
+	ps.values = append(ps.values, t...)
+}
+
 func (ps *Stack[T]) Pop() (T, bool) {
 	value, valid := ps.Peek()
 	if valid {
@@ -17,6 +21,17 @@ func (ps *Stack[T]) Pop() (T, bool) {
 	}
 
 	return value, valid
+}
+
+func (ps *Stack[T]) PopMultiple(i int) ([]T, bool) {
+	if i > len(ps.values) {
+		return nil, false
+	}
+
+	values := ps.values[len(ps.values)-i:]
+	ps.values = ps.values[:len(ps.values)-i]
+
+	return values, true
 }
 
 func (ps *Stack[T]) Peek() (T, bool) {
