@@ -47,39 +47,14 @@ func processMovesPart2(stacks []datastructures.Stack[string], moves []move) {
 }
 
 func parseStackLines(inputLines []string) []datastructures.Stack[string] {
-	lines := inputLines
-
-	// save initial stack lines in a stack - we need to process in reverse
-	var stackLines datastructures.Stack[string]
-
-	// find the initial stack configuration lines
-	for {
-		currentLine := lines[0]
-		if strings.ContainsRune(currentLine, '[') {
-			stackLines.Push(currentLine)
-			lines = lines[1:]
-		} else {
-			break
-		}
-	}
-
-	// input lines now pointing to the number of stacks
-	currentLine := lines[0]
-	lines = lines[1:]
-	s := strings.Fields(currentLine)
+	// calculate number of stacks
+	s := strings.Fields(inputLines[len(inputLines)-1])
 	numberOfStacks, _ := strconv.Atoi(s[len(s)-1])
 	stacks := make([]datastructures.Stack[string], numberOfStacks)
 
-	// we now know the number of stack, we can process the stack definitions in reverse order
-	var stackLine string
-	var valid bool
-	for {
-		stackLine, valid = stackLines.Pop()
-		if valid {
-			populateStack(stackLine, stacks)
-		} else {
-			break
-		}
+	// process stack information backwards
+	for i := len(inputLines) - 2; i >= 0; i-- {
+		populateStack(inputLines[i], stacks)
 	}
 
 	return stacks
