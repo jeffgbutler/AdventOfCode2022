@@ -11,21 +11,21 @@ type move struct {
 	count, from, to int
 }
 
-func part1(inputLines []string) string {
-	stacks, moves := parseInputFile(inputLines)
+func part1(inputLineGroups [][]string) string {
+	stacks, moves := parseInputFile(inputLineGroups)
 	processMovesPart1(stacks, moves)
 	return buildAnswer(stacks)
 }
 
-func part2(inputLines []string) string {
-	stacks, moves := parseInputFile(inputLines)
+func part2(inputLineGroups [][]string) string {
+	stacks, moves := parseInputFile(inputLineGroups)
 	processMovesPart2(stacks, moves)
 	return buildAnswer(stacks)
 }
 
-func parseInputFile(inputLines []string) ([]datastructures.Stack[string], []move) {
-	stacks, lines := parseStackLines(inputLines)
-	moves := parseMoveLines(lines)
+func parseInputFile(inputLineGroups [][]string) ([]datastructures.Stack[string], []move) {
+	stacks := parseStackLines(inputLineGroups[0])
+	moves := parseMoveLines(inputLineGroups[1])
 
 	return stacks, moves
 }
@@ -46,7 +46,7 @@ func processMovesPart2(stacks []datastructures.Stack[string], moves []move) {
 	}
 }
 
-func parseStackLines(inputLines []string) ([]datastructures.Stack[string], []string) {
+func parseStackLines(inputLines []string) []datastructures.Stack[string] {
 	lines := inputLines
 
 	// save initial stack lines in a stack - we need to process in reverse
@@ -82,8 +82,7 @@ func parseStackLines(inputLines []string) ([]datastructures.Stack[string], []str
 		}
 	}
 
-	// skip blank line, so we're now positioned at the moves
-	return stacks, lines[1:]
+	return stacks
 }
 
 func populateStack(inputLine string, stacks []datastructures.Stack[string]) {
@@ -97,17 +96,15 @@ func populateStack(inputLine string, stacks []datastructures.Stack[string]) {
 }
 
 func parseMoveLines(inputLines []string) []move {
-	var moves []move
+	return functions.Map(inputLines, convertLineToMove)
+}
 
-	for _, inputLine := range inputLines {
-		s := strings.Split(inputLine, " ")
-		count, _ := strconv.Atoi(s[1])
-		from, _ := strconv.Atoi(s[3])
-		to, _ := strconv.Atoi(s[5])
-		moves = append(moves, move{count, from, to})
-	}
-
-	return moves
+func convertLineToMove(line string) move {
+	s := strings.Split(line, " ")
+	count, _ := strconv.Atoi(s[1])
+	from, _ := strconv.Atoi(s[3])
+	to, _ := strconv.Atoi(s[5])
+	return move{count, from, to}
 }
 
 func buildAnswer(stacks []datastructures.Stack[string]) string {
