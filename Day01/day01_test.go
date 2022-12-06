@@ -5,26 +5,14 @@ import (
 	"testing"
 )
 
-func Test_readInputFile(t *testing.T) {
-	lines, err := inputfile.Read("testdata/example.txt")
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if len(lines) != 20 {
-		t.Error("Expected 20 lines, got", len(lines))
-	}
-}
-
 func Test_Converter(t *testing.T) {
-	lines, err := inputfile.Read("testdata/example.txt")
+	groups, err := inputfile.ReadGroups("testdata/example.txt")
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	elves, err := convertToElves(lines)
+	elves, err := convertToElves(groups)
 
 	if err != nil {
 		t.Fatal(err)
@@ -36,13 +24,13 @@ func Test_Converter(t *testing.T) {
 }
 
 func Test_findGreatestElfWithExampleData(t *testing.T) {
-	lines, err := inputfile.Read("testdata/example.txt")
+	groups, err := inputfile.ReadGroups("testdata/example.txt")
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	elves, err := convertToElves(lines)
+	elves, err := convertToElves(groups)
 
 	if err != nil {
 		t.Fatal(err)
@@ -56,13 +44,13 @@ func Test_findGreatestElfWithExampleData(t *testing.T) {
 }
 
 func Test_findGreatestElfWithActualData(t *testing.T) {
-	lines, err := inputfile.Read("testdata/actual.txt")
+	groups, err := inputfile.ReadGroups("testdata/actual.txt")
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	elves, err := convertToElves(lines)
+	elves, err := convertToElves(groups)
 
 	if err != nil {
 		t.Fatal(err)
@@ -76,13 +64,13 @@ func Test_findGreatestElfWithActualData(t *testing.T) {
 }
 
 func Test_findTopThreeElvesWithExampleData(t *testing.T) {
-	lines, err := inputfile.Read("testdata/example.txt")
+	groups, err := inputfile.ReadGroups("testdata/example.txt")
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	elves, err := convertToElves(lines)
+	elves, err := convertToElves(groups)
 
 	if err != nil {
 		t.Fatal(err)
@@ -103,13 +91,13 @@ func Test_findTopThreeElvesWithExampleData(t *testing.T) {
 }
 
 func Test_findTopThreeElvesWithActualData(t *testing.T) {
-	lines, err := inputfile.Read("testdata/actual.txt")
+	groups, err := inputfile.ReadGroups("testdata/actual.txt")
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	elves, err := convertToElves(lines)
+	elves, err := convertToElves(groups)
 
 	if err != nil {
 		t.Fatal(err)

@@ -11,31 +11,21 @@ type elf struct {
 	calories  int
 }
 
-func convertToElves(lines []string) ([]elf, error) {
+func convertToElves(lineGroups [][]string) ([]elf, error) {
 	var allElves []elf
-	var currentElf elf
 
-	for _, line := range lines {
-		if len(line) == 0 {
-			if currentElf.calories > 0 {
-				allElves = append(allElves, currentElf)
-				currentElf = elf{len(allElves) + 1, 0}
-			} else {
-				continue
-			}
-		} else {
-			num, err := strconv.Atoi(line)
-			if err != nil {
-				return allElves, err
-			}
-			currentElf.calories += num
-		}
-	}
-
-	if currentElf.calories > 0 {
+	for i, group := range lineGroups {
+		total := functions.Reduce(group, 0, addSingleLineValue)
+		currentElf := elf{i + 1, total}
 		allElves = append(allElves, currentElf)
 	}
+
 	return allElves, nil
+}
+
+func addSingleLineValue(i int, line string) int {
+	num, _ := strconv.Atoi(line)
+	return i + num
 }
 
 func findGreatestElf(elves []elf) elf {
