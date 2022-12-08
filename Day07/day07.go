@@ -16,8 +16,7 @@ type directory struct {
 	name           string
 	parent         *directory
 	files          []file
-	subDirectories []directory
-	added          bool
+	subDirectories []*directory
 }
 
 type directoryInfo struct {
@@ -29,13 +28,13 @@ func (d *directory) AddFile(f file) {
 	d.files = append(d.files, f)
 }
 
-func (d *directory) AddDirectory(dir directory) {
+func (d *directory) AddDirectory(dir *directory) {
 	d.subDirectories = append(d.subDirectories, dir)
 }
 
 func (d *directory) Size() int {
 	fileSize := functions.Reduce(d.files, 0, func(total int, f file) int { return total + f.size })
-	directorySize := functions.Reduce(d.subDirectories, 0, func(total int, dir directory) int { return total + dir.Size() })
+	directorySize := functions.Reduce(d.subDirectories, 0, func(total int, dir *directory) int { return total + dir.Size() })
 	return fileSize + directorySize
 }
 
@@ -98,14 +97,12 @@ func parseInput(inputLines []string) directory {
 		case inputLine == "$ cd /":
 			root = directory{name: "/"}
 			currentDirectory = &root
-			continue
 		case inputLine == "$ cd ..":
-			currentDirectory.added = true
-			currentDirectory.parent.AddDirectory(*currentDirectory)
 			currentDirectory = currentDirectory.parent
 		case strings.HasPrefix(inputLine, "$ cd"):
 			dirName := parseCDLine(inputLine)
 			newDir := directory{name: dirName, parent: currentDirectory}
+			currentDirectory.AddDirectory(&newDir)
 			currentDirectory = &newDir
 		case inputLine == "$ ls":
 			continue
@@ -114,19 +111,6 @@ func parseInput(inputLines []string) directory {
 		default:
 			currentDirectory.AddFile(parseFileLine(inputLine))
 		}
-	}
-
-	for {
-		if currentDirectory.name == "/" {
-			break
-		}
-
-		if !currentDirectory.added {
-			currentDirectory.added = true
-			currentDirectory.parent.AddDirectory(*currentDirectory)
-		}
-
-		currentDirectory = currentDirectory.parent
 	}
 
 	return root
