@@ -107,6 +107,10 @@ func parseInput(inputLines []string) directory {
 			dirName := parseCDLine(inputLine)
 			newDir := directory{name: dirName, parent: currentDirectory}
 			currentDirectory = &newDir
+		case inputLine == "$ ls":
+			continue
+		case strings.HasPrefix(inputLine, "dir "):
+			continue
 		default:
 			currentDirectory.AddFile(parseFileLine(inputLine))
 		}
