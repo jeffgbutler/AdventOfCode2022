@@ -16,7 +16,7 @@ type directory struct {
 	name           string
 	parent         *directory
 	files          []file
-	subDirectories []*directory
+	subDirectories []directory
 }
 
 type directoryInfo struct {
@@ -28,13 +28,16 @@ func (d *directory) AddFile(f file) {
 	d.files = append(d.files, f)
 }
 
-func (d *directory) AddDirectory(dir *directory) {
+func (d *directory) AddDirectory(dir directory) *directory {
 	d.subDirectories = append(d.subDirectories, dir)
+	// why??? because "dir" is a copy of the caller's value, and calling "append" makes yet another copy.
+	// need to return a pointer to the final copy. Go is pass by value - always!
+	return &d.subDirectories[len(d.subDirectories)-1]
 }
 
 func (d *directory) Size() int {
 	fileSize := functions.Reduce(d.files, 0, func(total int, f file) int { return total + f.size })
-	directorySize := functions.Reduce(d.subDirectories, 0, func(total int, dir *directory) int { return total + dir.Size() })
+	directorySize := functions.Reduce(d.subDirectories, 0, func(total int, dir directory) int { return total + dir.Size() })
 	return fileSize + directorySize
 }
 
@@ -102,8 +105,7 @@ func parseInput(inputLines []string) directory {
 		case strings.HasPrefix(inputLine, "$ cd"):
 			dirName := parseCDLine(inputLine)
 			newDir := directory{name: dirName, parent: currentDirectory}
-			currentDirectory.AddDirectory(&newDir)
-			currentDirectory = &newDir
+			currentDirectory = currentDirectory.AddDirectory(newDir)
 		case inputLine == "$ ls":
 			continue
 		case strings.HasPrefix(inputLine, "dir "):
