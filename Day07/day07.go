@@ -28,10 +28,8 @@ func (d *directory) AddFile(f file) {
 	d.files = append(d.files, f)
 }
 
-func (d *directory) AddDirectory(dir directory) *directory {
-	d.subDirectories = append(d.subDirectories, dir)
-	// why??? because "dir" is a copy of the caller's value, and calling "append" makes yet another copy.
-	// need to return a pointer to the final copy. Go is pass by value - always!
+func (d *directory) AddSubDirectory(name string) *directory {
+	d.subDirectories = append(d.subDirectories, directory{name: name, parent: d})
 	return &d.subDirectories[len(d.subDirectories)-1]
 }
 
@@ -103,9 +101,7 @@ func parseInput(inputLines []string) directory {
 		case inputLine == "$ cd ..":
 			currentDirectory = currentDirectory.parent
 		case strings.HasPrefix(inputLine, "$ cd"):
-			dirName := parseCDLine(inputLine)
-			newDir := directory{name: dirName, parent: currentDirectory}
-			currentDirectory = currentDirectory.AddDirectory(newDir)
+			currentDirectory = currentDirectory.AddSubDirectory(parseCDLine(inputLine))
 		case inputLine == "$ ls":
 			continue
 		case strings.HasPrefix(inputLine, "dir "):
