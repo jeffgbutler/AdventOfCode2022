@@ -10,90 +10,125 @@ type position struct {
 }
 
 func part1(inputLines []string) int {
+	return moveRope(inputLines, 2)
+}
 
-	headPosition := position{0, 0}
-	tailPosition := position{0, 0}
+func part2(inputLines []string) int {
+	return moveRope(inputLines, 10)
+}
+
+func moveRope(inputLines []string, numberOfKnots int) int {
+
+	positions := make([]position, numberOfKnots)
+
 	tailPositionSet := map[position]bool{}
-	tailPositionSet[tailPosition] = true
+	tailPositionSet[positions[len(positions)-1]] = true
 
 	for _, v := range inputLines {
 		f := strings.Fields(v)
 		steps, _ := strconv.Atoi(f[1])
 		switch f[0] {
 		case "U":
-			processUp(steps, &headPosition, &tailPosition, tailPositionSet)
+			processUp(steps, positions, tailPositionSet)
 		case "D":
-			processDown(steps, &headPosition, &tailPosition, tailPositionSet)
+			processDown(steps, positions, tailPositionSet)
 		case "L":
-			processLeft(steps, &headPosition, &tailPosition, tailPositionSet)
+			processLeft(steps, positions, tailPositionSet)
 		case "R":
-			processRight(steps, &headPosition, &tailPosition, tailPositionSet)
+			processRight(steps, positions, tailPositionSet)
 		}
 	}
 
 	return len(tailPositionSet)
 }
 
-func processUp(steps int, headPosition, tailPosition *position, tailPositionSet map[position]bool) {
+func processUp(steps int, positions []position, tailPositionSet map[position]bool) {
 	for i := 0; i < steps; i++ {
-		headPosition.y++
-		if headPosition.y-tailPosition.y > 1 {
-			tailPosition.y++
-			switch {
-			case tailPosition.x > headPosition.x:
-				tailPosition.x--
-			case tailPosition.x < headPosition.x:
-				tailPosition.x++
-			}
-			tailPositionSet[*tailPosition] = true
-		}
+		up(positions)
+		tailPositionSet[positions[len(positions)-1]] = true
 	}
 }
 
-func processDown(steps int, headPosition, tailPosition *position, tailPositionSet map[position]bool) {
-	for i := 0; i < steps; i++ {
-		headPosition.y--
-		if tailPosition.y-headPosition.y > 1 {
-			tailPosition.y--
-			switch {
-			case tailPosition.x > headPosition.x:
-				tailPosition.x--
-			case tailPosition.x < headPosition.x:
-				tailPosition.x++
-			}
-			tailPositionSet[*tailPosition] = true
-		}
+func up(positions []position) {
+	positions[0].y++
+	for i := 0; i < len(positions)-1; i++ {
+		positions[i+1] = moveTail(positions[i], positions[i+1])
 	}
 }
 
-func processLeft(steps int, headPosition, tailPosition *position, tailPositionSet map[position]bool) {
+func processDown(steps int, positions []position, tailPositionSet map[position]bool) {
 	for i := 0; i < steps; i++ {
-		headPosition.x--
-		if tailPosition.x-headPosition.x > 1 {
-			tailPosition.x--
-			switch {
-			case tailPosition.y > headPosition.y:
-				tailPosition.y--
-			case tailPosition.y < headPosition.y:
-				tailPosition.y++
-			}
-			tailPositionSet[*tailPosition] = true
-		}
+		down(positions)
+		tailPositionSet[positions[len(positions)-1]] = true
 	}
 }
 
-func processRight(steps int, headPosition, tailPosition *position, tailPositionSet map[position]bool) {
+func down(positions []position) {
+	positions[0].y--
+	for i := 0; i < len(positions)-1; i++ {
+		positions[i+1] = moveTail(positions[i], positions[i+1])
+	}
+}
+
+func processLeft(steps int, positions []position, tailPositionSet map[position]bool) {
 	for i := 0; i < steps; i++ {
-		headPosition.x++
-		if headPosition.x-tailPosition.x > 1 {
-			tailPosition.x++
-			switch {
-			case tailPosition.y > headPosition.y:
-				tailPosition.y--
-			case tailPosition.y < headPosition.y:
-				tailPosition.y++
-			}
-			tailPositionSet[*tailPosition] = true
-		}
+		left(positions)
+		tailPositionSet[positions[len(positions)-1]] = true
+	}
+}
+
+func left(positions []position) {
+	positions[0].x--
+	for i := 0; i < len(positions)-1; i++ {
+		positions[i+1] = moveTail(positions[i], positions[i+1])
+	}
+}
+
+func processRight(steps int, positions []position, tailPositionSet map[position]bool) {
+	for i := 0; i < steps; i++ {
+		right(positions)
+		tailPositionSet[positions[len(positions)-1]] = true
+	}
+}
+
+func right(positions []position) {
+	positions[0].x++
+	for i := 0; i < len(positions)-1; i++ {
+		positions[i+1] = moveTail(positions[i], positions[i+1])
+	}
+}
+
+func moveTail(headPosition, tailPosition position) position {
+	dx := headPosition.x - tailPosition.x
+	dy := headPosition.y - tailPosition.y
+
+	newTail := tailPosition
+
+	switch {
+	case dx > 1:
+		newTail.x++
+		newTail.y += limit(dy)
+	case dx < -1:
+		newTail.x--
+		newTail.y += limit(dy)
+	case dy > 1:
+		newTail.y++
+		newTail.x += limit(dx)
+	case dy < -1:
+		newTail.y--
+		newTail.x += limit(dx)
+	}
+
+	return newTail
+}
+
+func limit(i int) int {
+	switch {
+	case i > 0:
+		return 1
+	case i < 0:
+		return -1
+	default:
+		return 0
 	}
 }
