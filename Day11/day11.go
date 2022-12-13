@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+const OLD = 0
+
 type operation struct {
 	left, right int
 	op          string
@@ -27,7 +29,7 @@ func part1(inputLineGroups [][]string) int {
 	}
 
 	for i := 0; i < 20; i++ {
-		round(monkeys)
+		round(monkeys, func(i int) int { return i / 3 })
 	}
 
 	counts := functions.Map(monkeys, func(m monkey) int { return m.inspectionCount })
@@ -35,13 +37,36 @@ func part1(inputLineGroups [][]string) int {
 	return counts[0] * counts[1]
 }
 
-func round(monkeys []monkey) {
+func part2(inputLineGroups [][]string) int {
+	var monkeys []monkey
+
+	for _, g := range inputLineGroups {
+		monkeys = append(monkeys, parseMonkey(g))
+	}
+
+	lgm := calculateLgm(monkeys)
+
+	for i := 0; i < 10000; i++ {
+		round(monkeys, func(i int) int { return i % lgm })
+	}
+
+	counts := functions.Map(monkeys, func(m monkey) int { return m.inspectionCount })
+	sort.Slice(counts, func(i, j int) bool { return counts[i] > counts[j] })
+	return counts[0] * counts[1]
+}
+
+func calculateLgm(monkeys []monkey) int {
+	divisors := functions.Map(monkeys, func(m monkey) int { return m.divisor })
+	return functions.Reduce(divisors, 1, func(i, j int) int { return i * j })
+}
+
+func round(monkeys []monkey, managementStrategy func(int) int) {
 	for i := 0; i < len(monkeys); i++ {
 		mky := &monkeys[i]
 		for _, item := range mky.items {
 			mky.inspectionCount++
 			a := performOperation(item, mky.operation)
-			a = a / 3
+			a = managementStrategy(a)
 			if a%mky.divisor == 0 {
 				throwToMonkey(a, mky.trueTarget, monkeys)
 			} else {
@@ -53,15 +78,15 @@ func round(monkeys []monkey) {
 }
 
 func performOperation(old int, op operation) int {
-	if op.left == -99999 {
+	if op.left == OLD {
 		op.left = old
 	}
 
-	if op.right == -99999 {
+	if op.right == OLD {
 		op.right = old
 	}
 
-	answer := 0
+	var answer int
 	switch op.op {
 	case "*":
 		answer = op.left * op.right
@@ -72,7 +97,7 @@ func performOperation(old int, op operation) int {
 	return answer
 }
 
-func throwToMonkey(item, targetMonkey int, monkeys []monkey) {
+func throwToMonkey(item int, targetMonkey int, monkeys []monkey) {
 	mky := &monkeys[targetMonkey]
 	mky.items = append(mky.items, item)
 }
@@ -144,7 +169,7 @@ func parseOperation(line string) operation {
 	answer := operation{}
 
 	if f[0] == "old" {
-		answer.left = -99999
+		answer.left = OLD
 	} else {
 		i, _ := strconv.Atoi(f[0])
 		answer.left = i
@@ -153,7 +178,7 @@ func parseOperation(line string) operation {
 	answer.op = f[1]
 
 	if f[2] == "old" {
-		answer.right = -99999
+		answer.right = OLD
 	} else {
 		i, _ := strconv.Atoi(f[2])
 		answer.right = i
