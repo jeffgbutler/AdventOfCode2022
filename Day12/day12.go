@@ -2,30 +2,47 @@ package Day12
 
 import (
 	"github.com/jeffgbutler/AdventOfCode2022/datastructures"
+	"sort"
 )
 
 type point struct {
 	x, y int
 }
 
-type nodeData struct {
-	height  int
-	visited bool
-}
-
 type heightMap struct {
 	start, end    point
-	grid          map[point]nodeData
+	grid          map[point]int
 	rows, columns int
 }
 
 func newHeightMap() heightMap {
-	return heightMap{grid: make(map[point]nodeData)}
+	return heightMap{grid: make(map[point]int)}
 }
 
 func part1(inputLines []string) int {
 	theMap := parse(inputLines)
 	return bfs(theMap.start, theMap.end, theMap.grid)
+}
+
+func part2(inputLines []string) int {
+	theMap := parse(inputLines)
+
+	var allSteps []int
+	for x := 0; x < theMap.columns; x++ {
+		for y := 0; y < theMap.rows; y++ {
+			p := point{x, y}
+			height, ok := theMap.grid[p]
+			if ok && height == 1 {
+				steps := bfs(p, theMap.end, theMap.grid)
+				if steps != -1 {
+					allSteps = append(allSteps, steps)
+				}
+			}
+		}
+	}
+
+	sort.Slice(allSteps, func(i, j int) bool { return allSteps[i] < allSteps[j] })
+	return allSteps[0]
 }
 
 func parse(inputLines []string) heightMap {
@@ -42,13 +59,13 @@ func parse(inputLines []string) heightMap {
 			switch char {
 			case 'S':
 				answer.start = p
-				answer.grid[p] = nodeData{height: 1}
+				answer.grid[p] = 1
 			case 'E':
 				answer.end = p
-				answer.grid[p] = nodeData{height: 26}
+				answer.grid[p] = 26
 			default:
 				val := int(char) - int('a') + 1
-				answer.grid[p] = nodeData{height: val}
+				answer.grid[p] = val
 			}
 		}
 	}
@@ -56,12 +73,11 @@ func parse(inputLines []string) heightMap {
 	return answer
 }
 
-func bfs(start, end point, grid map[point]nodeData) int {
+func bfs(start, end point, grid map[point]int) int {
 	var queue datastructures.Queue[point]
+	visitedMap := map[point]bool{}
 	queue.Enqueue(start)
-	nd1 := grid[start]
-	nd1.visited = true
-	grid[start] = nd1
+	visitedMap[start] = true
 
 	steps := 0
 	nodesLeftInLayer := 1
@@ -82,13 +98,12 @@ func bfs(start, end point, grid map[point]nodeData) int {
 
 		adjPoints := adjacentPoints(p, grid)
 		for _, adjacentPoint := range adjPoints {
-			nd := grid[adjacentPoint]
-			if nd.visited {
+			visited, iok := visitedMap[adjacentPoint]
+			if iok && visited {
 				continue
 			}
 
-			nd.visited = true
-			grid[adjacentPoint] = nd
+			visitedMap[adjacentPoint] = true
 			queue.Enqueue(adjacentPoint)
 			nodesInNextLayer++
 		}
@@ -109,32 +124,32 @@ func bfs(start, end point, grid map[point]nodeData) int {
 	}
 }
 
-func adjacentPoints(p point, theMap map[point]nodeData) []point {
+func adjacentPoints(p point, theMap map[point]int) []point {
 	var answer []point
-	var myHeight = theMap[p].height
+	var myHeight = theMap[p]
 
 	// brute force
 	adjPoint := point{p.x + 1, p.y}
-	nd, ok := theMap[adjPoint]
-	if ok && nd.height-1 <= myHeight {
+	nodeHeight, ok := theMap[adjPoint]
+	if ok && nodeHeight-1 <= myHeight {
 		answer = append(answer, adjPoint)
 	}
 
 	adjPoint = point{p.x - 1, p.y}
-	nd, ok = theMap[adjPoint]
-	if ok && nd.height-1 <= myHeight {
+	nodeHeight, ok = theMap[adjPoint]
+	if ok && nodeHeight-1 <= myHeight {
 		answer = append(answer, adjPoint)
 	}
 
 	adjPoint = point{p.x, p.y + 1}
-	nd, ok = theMap[adjPoint]
-	if ok && nd.height-1 <= myHeight {
+	nodeHeight, ok = theMap[adjPoint]
+	if ok && nodeHeight-1 <= myHeight {
 		answer = append(answer, adjPoint)
 	}
 
 	adjPoint = point{p.x, p.y + -1}
-	nd, ok = theMap[adjPoint]
-	if ok && nd.height-1 <= myHeight {
+	nodeHeight, ok = theMap[adjPoint]
+	if ok && nodeHeight-1 <= myHeight {
 		answer = append(answer, adjPoint)
 	}
 
