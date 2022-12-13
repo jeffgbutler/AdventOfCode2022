@@ -60,13 +60,13 @@ func calculateLgm(monkeys []monkey) int {
 	return functions.Reduce(divisors, 1, func(i, j int) int { return i * j })
 }
 
-func round(monkeys []monkey, managementStrategy func(int) int) {
+func round(monkeys []monkey, overflowManagementStrategy func(int) int) {
 	for i := 0; i < len(monkeys); i++ {
 		mky := &monkeys[i]
 		for _, item := range mky.items {
 			mky.inspectionCount++
 			a := performOperation(item, mky.operation)
-			a = managementStrategy(a)
+			a = overflowManagementStrategy(a)
 			if a%mky.divisor == 0 {
 				throwToMonkey(a, mky.trueTarget, monkeys)
 			} else {
@@ -97,7 +97,7 @@ func performOperation(old int, op operation) int {
 	return answer
 }
 
-func throwToMonkey(item int, targetMonkey int, monkeys []monkey) {
+func throwToMonkey(item, targetMonkey int, monkeys []monkey) {
 	mky := &monkeys[targetMonkey]
 	mky.items = append(mky.items, item)
 }
