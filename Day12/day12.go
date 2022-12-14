@@ -47,13 +47,12 @@ func part2(inputLines []string) int {
 
 func parse(inputLines []string) heightMap {
 	answer := newHeightMap()
+	answer.rows = len(inputLines)
+	answer.columns = len(inputLines[0])
 
 	for y := 0; y < len(inputLines); y++ {
-		answer.rows++
-		answer.columns = 0
 		inputLine := inputLines[y]
 		for x := 0; x < len(inputLine); x++ {
-			answer.columns++
 			p := point{x, y}
 			char := inputLine[x]
 			switch char {
@@ -75,55 +74,43 @@ func parse(inputLines []string) heightMap {
 
 func bfs(start, end point, grid map[point]int) int {
 	var queue datastructures.Queue[point]
-	visitedMap := map[point]bool{}
-	queue.Enqueue(start)
-	visitedMap[start] = true
+	isVisited := map[point]bool{}
+	parents := map[point]point{}
 
-	steps := 0
-	nodesLeftInLayer := 1
-	nodesInNextLayer := 0
+	queue.Enqueue(start)
+	isVisited[start] = true
+
 	reachedEnd := false
 
-	for {
-		p, ok := queue.Dequeue()
-
-		if !ok {
-			break
-		}
+	for !queue.IsEmpty() {
+		p, _ := queue.Dequeue()
 
 		if p == end {
 			reachedEnd = true
 			break
 		}
 
-		adjPoints := adjacentPoints(p, grid)
-		for _, adjacentPoint := range adjPoints {
-			if visitedMap[adjacentPoint] {
+		for _, adjacentPoint := range adjacentPoints(p, grid) {
+			if isVisited[adjacentPoint] {
 				continue
 			}
 
-			// set parent here!
-			// adjacentPoint.parent = p
-			// or
-			// parentsMap[adjacentPoint] = p
-			visitedMap[adjacentPoint] = true
+			parents[adjacentPoint] = p
+			isVisited[adjacentPoint] = true
 			queue.Enqueue(adjacentPoint)
-			nodesInNextLayer++
-		}
-
-		nodesLeftInLayer--
-
-		if nodesLeftInLayer == 0 {
-			steps++
-			nodesLeftInLayer = nodesInNextLayer
-			nodesInNextLayer = 0
 		}
 	}
 
 	if reachedEnd {
-		return steps
+		shortestPath := calculateShortestPath(end, parents)
+		if shortestPath[0] == start {
+			// answers do not include the start as a step
+			return len(shortestPath) - 1
+		} else {
+			return -2 // no path from start to end
+		}
 	} else {
-		return -1
+		return -1 // never found the end
 	}
 }
 
@@ -158,4 +145,22 @@ func adjacentPoints(p point, theMap map[point]int) []point {
 func pointIsEligible(adjPoint point, myHeight int, theMap map[point]int) bool {
 	nodeHeight, ok := theMap[adjPoint]
 	return ok && nodeHeight-1 <= myHeight
+}
+
+func calculateShortestPath(end point, parents map[point]point) []point {
+	var shortestPath []point
+	currentPoint := end
+	ok := true
+
+	for ; ok == true; currentPoint, ok = parents[currentPoint] {
+		shortestPath = append(shortestPath, currentPoint)
+	}
+
+	// reverse... this is from https://github.com/golang/go/wiki/SliceTricks
+	for i := len(shortestPath)/2 - 1; i >= 0; i-- {
+		opp := len(shortestPath) - 1 - i
+		shortestPath[i], shortestPath[opp] = shortestPath[opp], shortestPath[i]
+	}
+
+	return shortestPath
 }
