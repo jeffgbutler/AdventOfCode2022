@@ -98,11 +98,14 @@ func bfs(start, end point, grid map[point]int) int {
 
 		adjPoints := adjacentPoints(p, grid)
 		for _, adjacentPoint := range adjPoints {
-			visited, iok := visitedMap[adjacentPoint]
-			if iok && visited {
+			if visitedMap[adjacentPoint] {
 				continue
 			}
 
+			// set parent here!
+			// adjacentPoint.parent = p
+			// or
+			// parentsMap[adjacentPoint] = p
 			visitedMap[adjacentPoint] = true
 			queue.Enqueue(adjacentPoint)
 			nodesInNextLayer++
@@ -130,28 +133,29 @@ func adjacentPoints(p point, theMap map[point]int) []point {
 
 	// brute force
 	adjPoint := point{p.x + 1, p.y}
-	nodeHeight, ok := theMap[adjPoint]
-	if ok && nodeHeight-1 <= myHeight {
+	if pointIsEligible(adjPoint, myHeight, theMap) {
 		answer = append(answer, adjPoint)
 	}
 
 	adjPoint = point{p.x - 1, p.y}
-	nodeHeight, ok = theMap[adjPoint]
-	if ok && nodeHeight-1 <= myHeight {
+	if pointIsEligible(adjPoint, myHeight, theMap) {
 		answer = append(answer, adjPoint)
 	}
 
 	adjPoint = point{p.x, p.y + 1}
-	nodeHeight, ok = theMap[adjPoint]
-	if ok && nodeHeight-1 <= myHeight {
+	if pointIsEligible(adjPoint, myHeight, theMap) {
 		answer = append(answer, adjPoint)
 	}
 
 	adjPoint = point{p.x, p.y + -1}
-	nodeHeight, ok = theMap[adjPoint]
-	if ok && nodeHeight-1 <= myHeight {
+	if pointIsEligible(adjPoint, myHeight, theMap) {
 		answer = append(answer, adjPoint)
 	}
 
 	return answer
+}
+
+func pointIsEligible(adjPoint point, myHeight int, theMap map[point]int) bool {
+	nodeHeight, ok := theMap[adjPoint]
+	return ok && nodeHeight-1 <= myHeight
 }
