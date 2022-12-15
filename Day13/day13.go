@@ -38,9 +38,7 @@ type lp []packet
 
 func (l lp) compareTo(other packet) int {
 	if other.isInt() {
-		o := other.(ip)
-		v2 := lp{o}
-		return l.compareTo(v2)
+		return l.compareTo(lp{other})
 	} else {
 		return compareTo(l, other.(lp))
 	}
