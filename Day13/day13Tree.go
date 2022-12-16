@@ -100,8 +100,8 @@ func part2WithTrees(inputLineGroups [][]string) int {
 	// sort the trees
 	sort.Slice(allTrees, func(i, j int) bool { return compareTrees(allTrees[i], allTrees[j]) <= 0 })
 
-	startDivider := newStartDivider()
-	endDivider := newEndDivider()
+	startDivider := parseInputLineToTree("[[2]]")
+	endDivider := parseInputLineToTree("[[6]]")
 
 	startIndex := 0
 	endIndex := 0
@@ -175,24 +175,4 @@ func parseInputLineToTree(inputLine string) tree {
 		}
 	}
 	return root
-}
-
-func newStartDivider() tree {
-	startDivider := tree{value: -1}
-	subTree := tree{value: -1, parent: &startDivider}
-	subSubTree := tree{value: 2, parent: &subTree}
-	subTree.children = append(subTree.children, &subSubTree)
-	startDivider.children = append(startDivider.children, &subTree)
-
-	return startDivider
-}
-
-func newEndDivider() tree {
-	startDivider := tree{value: -1}
-	subTree := tree{value: -1, parent: &startDivider}
-	subSubTree := tree{value: 6, parent: &subTree}
-	subTree.children = append(subTree.children, &subSubTree)
-	startDivider.children = append(startDivider.children, &subTree)
-
-	return startDivider
 }

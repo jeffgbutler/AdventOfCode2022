@@ -45,8 +45,8 @@ func Test_Part2TreesWithActualData(t *testing.T) {
 	}
 }
 
-func Test_ToString1(t *testing.T) {
-	input := "[]"
+func Test_ParseAndToString(t *testing.T) {
+	input := "[1,[2,[3,[4,[5,6,7]]]],8,9]"
 
 	parsedTree := parseInputLineToTree(input)
 
@@ -54,21 +54,5 @@ func Test_ToString1(t *testing.T) {
 
 	if input != output {
 		t.Error("Parse/ToString mismatch.")
-	}
-}
-
-func Test_ToString2(t *testing.T) {
-	startDivider := newStartDivider()
-	endDivider := newEndDivider()
-
-	sst := toString(startDivider)
-	est := toString(endDivider)
-
-	if sst != "[[2]]" {
-		t.Error("Expected [[2]], got", sst)
-	}
-
-	if est != "[[6]]" {
-		t.Error("Expected [[6]], got", sst)
 	}
 }
