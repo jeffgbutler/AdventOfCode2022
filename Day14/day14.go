@@ -9,7 +9,9 @@ type point struct {
 	x, y int
 }
 
-type vector point
+type vector struct {
+	dx, dy int
+}
 
 type gridRange struct {
 	maxX, minX, maxY, minY int
@@ -23,13 +25,27 @@ const (
 	OffGrid
 )
 
+type moveData struct {
+	downVector, downLeftVector, downRightVector vector
+	start                                       point
+}
+
+func newMoveData() moveData {
+	return moveData{
+		downVector:      vector{0, 1},
+		downLeftVector:  vector{-1, 1},
+		downRightVector: vector{1, 1},
+		start:           point{500, 0},
+	}
+}
+
 func part1(inputLines []string) int {
 	grid := parseInputLines(inputLines)
 	gr := calculateGridRange(grid)
-
+	md := newMoveData()
 	ticks := 0
 	for {
-		if tick(grid, gr) {
+		if tick(grid, md, gr) {
 			ticks++
 		} else {
 			break
@@ -37,6 +53,24 @@ func part1(inputLines []string) int {
 	}
 
 	return ticks
+}
+
+func part2(inputLines []string) int {
+	grid := parseInputLines(inputLines)
+	gr := calculateGridRange(grid)
+	md := newMoveData()
+	floorY := gr.maxY + 2
+
+	ticks := 0
+	for {
+		if tickWithFloor(grid, md, floorY) {
+			ticks++
+		} else {
+			break
+		}
+	}
+
+	return ticks + 1
 }
 
 func toString(grid map[point]rune) []string {
@@ -59,16 +93,47 @@ func toString(grid map[point]rune) []string {
 	return lines
 }
 
-func tick(grid map[point]rune, gr gridRange) bool {
-	downVector := vector{0, 1}
-	downLeftVector := vector{-1, 1}
-	downRightVector := vector{1, 1}
-	start := point{500, 0}
-
-	current := start
+func tickWithFloor(grid map[point]rune, md moveData, floorY int) bool {
+	current := md.start
 
 	for {
-		nextPosition := addVector(current, downVector)
+		nextPosition := addVector(current, md.downVector)
+		result := tryMoveWithFloor(nextPosition, grid, floorY)
+		if result == OK {
+			current = nextPosition
+			continue
+		}
+
+		nextPosition = addVector(current, md.downLeftVector)
+		result = tryMoveWithFloor(nextPosition, grid, floorY)
+		if result == OK {
+			current = nextPosition
+			continue
+		}
+
+		nextPosition = addVector(current, md.downRightVector)
+		result = tryMoveWithFloor(nextPosition, grid, floorY)
+		if result == OK {
+			current = nextPosition
+			continue
+		}
+
+		// none of the next positions work, stop where we are
+		if current == md.start {
+			// the input is blocked
+			return false
+		}
+
+		grid[current] = 'o'
+		return true
+	}
+}
+
+func tick(grid map[point]rune, md moveData, gr gridRange) bool {
+	current := md.start
+
+	for {
+		nextPosition := addVector(current, md.downVector)
 		result := tryMove(nextPosition, grid, gr)
 		if result == OK {
 			current = nextPosition
@@ -77,7 +142,7 @@ func tick(grid map[point]rune, gr gridRange) bool {
 			return false
 		}
 
-		nextPosition = addVector(current, downLeftVector)
+		nextPosition = addVector(current, md.downLeftVector)
 		result = tryMove(nextPosition, grid, gr)
 		if result == OK {
 			current = nextPosition
@@ -86,7 +151,7 @@ func tick(grid map[point]rune, gr gridRange) bool {
 			return false
 		}
 
-		nextPosition = addVector(current, downRightVector)
+		nextPosition = addVector(current, md.downRightVector)
 		result = tryMove(nextPosition, grid, gr)
 		if result == OK {
 			current = nextPosition
@@ -104,6 +169,19 @@ func tick(grid map[point]rune, gr gridRange) bool {
 func tryMove(nextPosition point, grid map[point]rune, gr gridRange) moveResult {
 	if isPointOffGrid(nextPosition, gr) {
 		return OffGrid
+	}
+
+	_, ok := grid[nextPosition]
+	if ok {
+		return Blocked
+	} else {
+		return OK
+	}
+}
+
+func tryMoveWithFloor(nextPosition point, grid map[point]rune, floorY int) moveResult {
+	if nextPosition.y >= floorY {
+		return Blocked
 	}
 
 	_, ok := grid[nextPosition]
@@ -208,6 +286,6 @@ func calculateIncrementVector(start, end point) vector {
 	}
 }
 
-func addVector(start point, increment vector) point {
-	return point{start.x + increment.x, start.y + increment.y}
+func addVector(start point, v vector) point {
+	return point{start.x + v.dx, start.y + v.dy}
 }

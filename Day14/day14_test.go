@@ -25,6 +25,26 @@ func Test_Part1WithActualData(t *testing.T) {
 	}
 }
 
+func Test_Part2WithExampleData(t *testing.T) {
+	inputLines, _ := inputfile.Read("testdata/example.txt")
+
+	answer := part2(inputLines)
+
+	if answer != 93 {
+		t.Error("Expected 93, got", answer)
+	}
+}
+
+func Test_Part2WithActualData(t *testing.T) {
+	inputLines, _ := inputfile.Read("testdata/actual.txt")
+
+	answer := part2(inputLines)
+
+	if answer != 31722 {
+		t.Error("Expected 31722, got", answer)
+	}
+}
+
 func Test_ToString(t *testing.T) {
 	inputLines, _ := inputfile.Read("testdata/example.txt")
 	grid := parseInputLines(inputLines)
