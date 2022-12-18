@@ -15,6 +15,16 @@ func Test_Part1WithExampleData(t *testing.T) {
 	}
 }
 
+func Test_Part1WithExampleDataRow11(t *testing.T) {
+	inputLines, _ := inputfile.Read("testdata/example.txt")
+
+	answer := part1(inputLines, 11)
+
+	if answer != 28 {
+		t.Error("Expected 28, got", answer)
+	}
+}
+
 func Test_Part1WithActualData(t *testing.T) {
 	inputLines, _ := inputfile.Read("testdata/actual.txt")
 

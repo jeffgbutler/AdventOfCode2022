@@ -22,8 +22,10 @@ type sensorAndReach struct {
 func part1(inputLines []string, row int) int {
 	sensorsAndReach := parse(inputLines)
 	var ranges []integerRange
+	beaconSet := map[point]bool{}
 
 	for _, sr := range sensorsAndReach {
+		beaconSet[sr.beacon] = true
 		rowToSensorDistance := abs(row - sr.sensor.y)
 		overlaps := rowToSensorDistance <= sr.reach
 		if overlaps {
@@ -40,8 +42,9 @@ func part1(inputLines []string, row int) int {
 		total += rg.max - rg.min + 1
 	}
 
-	return total - 1 // this assumes there is one and only one beacon in the range!
+	return total - beaconsInRow(beaconSet, row, ranges)
 }
+
 func collapseRanges(ranges []integerRange) []integerRange {
 	currentRanges := ranges
 	for {
@@ -52,6 +55,32 @@ func collapseRanges(ranges []integerRange) []integerRange {
 			currentRanges = newRanges
 		}
 	}
+}
+
+func beaconsInRow(beaconSet map[point]bool, row int, ranges []integerRange) int {
+	count := 0
+
+	for beacon := range beaconSet {
+		if beacon.y != row {
+			continue
+		}
+
+		if beaconIsInRow(beacon, ranges) {
+			count++
+		}
+	}
+
+	return count
+}
+
+func beaconIsInRow(beacon point, ranges []integerRange) bool {
+	for _, rg := range ranges {
+		if beacon.x >= rg.min && beacon.x <= rg.max {
+			return true
+		}
+	}
+
+	return false
 }
 
 func collapseRangeIteration(ranges []integerRange) []integerRange {
