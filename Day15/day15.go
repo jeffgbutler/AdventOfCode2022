@@ -34,21 +34,48 @@ func part1(inputLines []string, row int) int {
 		}
 	}
 
-	rg := collapseRanges(ranges)
-	return rg.max - rg.min // this assumes there is one and only one beacon in the range!
-}
-
-func collapseRanges(ranges []integerRange) integerRange {
-	// this assumes that there are no gaps in the ranges!
-	answer := integerRange{min: ranges[0].min, max: ranges[0].max}
+	ranges = collapseRanges(ranges)
+	total := 0
 	for _, rg := range ranges {
-		if rg.min < answer.min {
-			answer.min = rg.min
-		}
-		if rg.max > answer.max {
-			answer.max = rg.max
+		total += rg.max - rg.min + 1
+	}
+
+	return total - 1 // this assumes there is one and only one beacon in the range!
+}
+func collapseRanges(ranges []integerRange) []integerRange {
+	currentRanges := ranges
+	for {
+		newRanges := collapseRangeIteration(currentRanges)
+		if len(newRanges) == len(currentRanges) {
+			return newRanges
+		} else {
+			currentRanges = newRanges
 		}
 	}
+}
+
+func collapseRangeIteration(ranges []integerRange) []integerRange {
+	var answer []integerRange
+	currentRange := ranges[0]
+
+	for i := 1; i < len(ranges); i++ {
+		nextRange := ranges[i]
+		switch {
+		case nextRange.min >= currentRange.min && nextRange.max <= currentRange.max:
+			// next range contained within current range, ignore
+			continue
+		case nextRange.min > currentRange.max || nextRange.max < currentRange.min:
+			// ranges don't overlap
+			answer = append(answer, currentRange)
+			currentRange = nextRange
+		default:
+			// ranges overlap
+			currentRange.min = min(currentRange.min, nextRange.min)
+			currentRange.max = max(currentRange.max, nextRange.max)
+		}
+	}
+
+	answer = append(answer, currentRange)
 	return answer
 }
 
@@ -96,5 +123,21 @@ func abs(i int) int {
 		return -i
 	} else {
 		return i
+	}
+}
+
+func min(i1, i2 int) int {
+	if i1 < i2 {
+		return i1
+	} else {
+		return i2
+	}
+}
+
+func max(i1, i2 int) int {
+	if i1 > i2 {
+		return i1
+	} else {
+		return i2
 	}
 }

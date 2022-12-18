@@ -10,7 +10,7 @@ Once we know a sensor and it's paired beacon, we can calculate the distance betw
 be to maximum x or y distance from the sensor where there are no other beacons. I'll call this "reach".
 
 Now we can figure out if any sensor has reach over the target row. If the sensor's Y position is within reach of the
-target row then there is overlap. From the mount of overlap, we can calculate the X positions where there isn't a
+target row then there is overlap. From the amount of overlap, we can calculate the X positions where there isn't a
 sensor.
 
 In the example, our target row is 10.
