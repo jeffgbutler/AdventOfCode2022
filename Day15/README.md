@@ -1,7 +1,5 @@
 # Day 15 Notes
 
-## Part 1
-
 This is an exercise about finding an efficient algorithm. Of course there is a brute force method for solving
 this exercise, but there's no real learning in that approach and I have a feeling a brute force method would be
 very, very slow with the actual data.
@@ -40,5 +38,5 @@ In the example, our target row is 10.
 Now we know the ranges, but some of them overlap, so we should collapse them. The final range is -2:24.
 Remember that there may be gaps in the ranges, and a row may or may not have beacons.
 
-In the example the final range is 27 positions, and there is a sensor at position 2, so we need to remove
+In the example the final range is 27 positions, and there is a beacon at position 2, so we need to remove
 that - which leaves 26.

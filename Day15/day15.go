@@ -47,7 +47,7 @@ func calculateRowRanges(sensorsAndReach []sensorAndReach, row int) ([]integerRan
 		}
 	}
 
-	ranges = collapseRanges(ranges)
+	ranges = collapseAndSortRanges(ranges)
 
 	return ranges, beaconsInRow(beaconSet, row, ranges)
 }
@@ -97,7 +97,7 @@ func findSingleSlots(ranges []integerRange, maxCoordinate int) []int {
 	return slots
 }
 
-func collapseRanges(ranges []integerRange) []integerRange {
+func collapseAndSortRanges(ranges []integerRange) []integerRange {
 	currentRanges := ranges
 	sort.Slice(currentRanges, func(i, j int) bool { return currentRanges[i].min < currentRanges[j].min })
 	for {

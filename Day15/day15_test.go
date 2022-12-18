@@ -58,7 +58,7 @@ func Test_Part2WithActualData(t *testing.T) {
 func Test_RangeCollapse(t *testing.T) {
 	ranges := []integerRange{{1, 3}, {4, 14}, {-2, 2}, {14, 26}}
 
-	ranges = collapseRanges(ranges)
+	ranges = collapseAndSortRanges(ranges)
 
 	if len(ranges) != 1 {
 		t.Error("Expected 1, got", len(ranges))
