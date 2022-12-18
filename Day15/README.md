@@ -2,11 +2,11 @@
 
 ## Part 1
 
-For me, this is an exercise about finding an efficient algorithm. Of course there is a brute force method for solving
+This is an exercise about finding an efficient algorithm. Of course there is a brute force method for solving
 this exercise, but there's no real learning in that approach and I have a feeling a brute force method would be
 very, very slow with the actual data.
 
-Once we know a sensor and it's paired beacon, we can calculate the distance between them. The distance will also
+Once we know a sensor, and it's paired beacon, we can calculate the distance between them. The distance will also
 be to maximum x or y distance from the sensor where there are no other beacons. I'll call this "reach".
 
 Now we can figure out if any sensor has reach over the target row. If the sensor's Y position is within reach of the
@@ -37,6 +37,8 @@ In the example, our target row is 10.
 | 14, 3  | 15, 3  | 1     | No        |         |               |
 | 20, 1  | 15, 3  | 7     | No        |         |               |
 
-Now we know the ranges, but some of them overlap so we should collapse them ranges. The final range is -2:24.
+Now we know the ranges, but some of them overlap, so we should collapse them. The final range is -2:24.
+Remember that there may be gaps in the ranges, and a row may or may not have beacons.
 
-This is 27 positions, but the sensor is at position 2, so we need to remove that - which leaves 26.
+In the example the final range is 27 positions, and there is a sensor at position 2, so we need to remove
+that - which leaves 26.
