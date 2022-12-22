@@ -60,11 +60,15 @@ func Test_RangeCollapse(t *testing.T) {
 
 	ranges = collapseAndSortRanges(ranges)
 
-	if len(ranges) != 1 {
-		t.Error("Expected 1, got", len(ranges))
+	if len(ranges) != 2 {
+		t.Error("Expected 2, got", len(ranges))
 	}
 
-	if ranges[0].min != -2 || ranges[0].max != 26 {
-		t.Error("Wrong range:", ranges[0])
+	if ranges[0].min != -2 || ranges[0].max != 3 {
+		t.Error("Wrong range (0):", ranges[0])
+	}
+
+	if ranges[1].min != 4 || ranges[1].max != 26 {
+		t.Error("Wrong range (1):", ranges[1])
 	}
 }

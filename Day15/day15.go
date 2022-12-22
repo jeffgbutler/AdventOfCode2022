@@ -146,12 +146,6 @@ func collapseRangeIteration(ranges []integerRange) []integerRange {
 		case nextRange.min >= currentRange.min && nextRange.max <= currentRange.max:
 			// next range contained within current range, ignore
 			continue
-		case currentRange.max == nextRange.min-1:
-			// ranges adjacent
-			currentRange.max = max(currentRange.max, nextRange.max)
-		case currentRange.min == nextRange.max+1:
-			// ranges adjacent
-			currentRange.min = min(currentRange.min, nextRange.min)
 		case nextRange.min > currentRange.max || nextRange.max < currentRange.min:
 			// ranges don't overlap
 			answer = append(answer, currentRange)
