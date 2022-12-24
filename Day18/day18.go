@@ -9,49 +9,55 @@ type point struct {
 	x, y, z int
 }
 
-type face struct {
-	corner1, corner2 point
-}
-
 func part1(inputLines []string) int {
-	points := parse(inputLines)
+	cubes := parse(inputLines)
 
-	faceMap := map[face]int{}
-
-	for _, p := range points {
-		faces := pointToFaces(p)
-		for _, f := range faces {
-			i, _ := faceMap[f]
-			faceMap[f] = i + 1
-		}
+	exposedFaces := 0
+	for cube := range cubes {
+		exposedFaces += calculateExposedFaces(cube, cubes)
 	}
 
-	answer := 0
-	for _, i := range faceMap {
-		if i == 1 {
-			answer++
-		}
+	return exposedFaces
+}
+
+func calculateExposedFaces(cube point, cubes map[point]bool) int {
+	answer := 6
+
+	_, ok := cubes[point{cube.x + 1, cube.y, cube.z}]
+	if ok {
+		answer--
+	}
+
+	_, ok = cubes[point{cube.x - 1, cube.y, cube.z}]
+	if ok {
+		answer--
+	}
+
+	_, ok = cubes[point{cube.x, cube.y + 1, cube.z}]
+	if ok {
+		answer--
+	}
+
+	_, ok = cubes[point{cube.x, cube.y - 1, cube.z}]
+	if ok {
+		answer--
+	}
+
+	_, ok = cubes[point{cube.x, cube.y, cube.z + 1}]
+	if ok {
+		answer--
+	}
+
+	_, ok = cubes[point{cube.x, cube.y, cube.z - 1}]
+	if ok {
+		answer--
 	}
 
 	return answer
 }
 
-func pointToFaces(p point) []face {
-	faces := make([]face, 6)
-
-	faces[0] = face{p, point{p.x + 1, p.y + 1, p.z}}
-	faces[1] = face{p, point{p.x, p.y + 1, p.z + 1}}
-	faces[2] = face{p, point{p.x + 1, p.y, p.z + 1}}
-
-	faces[3] = face{point{p.x + 1, p.y, p.z}, point{p.x + 1, p.y + 1, p.z + 1}}
-	faces[4] = face{point{p.x, p.y + 1, p.z}, point{p.x + 1, p.y + 1, p.z + 1}}
-	faces[5] = face{point{p.x, p.y, p.z + 1}, point{p.x + 1, p.y + 1, p.z + 1}}
-
-	return faces
-}
-
-func parse(inputLines []string) []point {
-	var answer []point
+func parse(inputLines []string) map[point]bool {
+	answer := map[point]bool{}
 
 	for _, inputLine := range inputLines {
 		f := strings.Split(inputLine, ",")
@@ -60,7 +66,7 @@ func parse(inputLines []string) []point {
 		y, _ := strconv.Atoi(f[1])
 		z, _ := strconv.Atoi(f[2])
 
-		answer = append(answer, point{x, y, z})
+		answer[point{x, y, z}] = true
 	}
 
 	return answer
