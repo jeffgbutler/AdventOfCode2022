@@ -14,7 +14,7 @@ type vector struct {
 	dx, dy, dz int
 }
 
-type extant struct {
+type bounds struct {
 	min, max point
 }
 
@@ -28,11 +28,11 @@ var adjacentVectors = []vector{
 }
 
 func part1(inputLines []string) int {
-	cubes, _ := parse(inputLines)
+	lavaCubes, _ := parse(inputLines)
 
 	exposedFaces := 0
-	for cube := range cubes {
-		exposedFaces += calculateExposedFaces(cube, cubes)
+	for cube := range lavaCubes {
+		exposedFaces += calculateExposedFaces(cube, lavaCubes)
 	}
 
 	return exposedFaces
@@ -56,8 +56,8 @@ func calculateCoveredFaces(cube point, cubes map[point]bool) int {
 }
 
 func part2(inputLines []string) int {
-	lavaCubes, gridExtant := parse(inputLines)
-	steamCubes := calculateSteamCubes(lavaCubes, gridExtant)
+	lavaCubes, gridBorder := parse(inputLines)
+	steamCubes := calculateSteamCubes(lavaCubes, gridBorder)
 
 	exteriorFaces := 0
 
@@ -68,17 +68,17 @@ func part2(inputLines []string) int {
 	return exteriorFaces
 }
 
-func calculateSteamCubes(lavaCubes map[point]bool, gridExtant extant) map[point]bool {
-	// do a bfs walk over the extant to find everywhere steam could go
-	expanded := extant{
-		addVector(gridExtant.min, vector{-1, -1, -1}),
-		addVector(gridExtant.max, vector{1, 1, 1}),
+func calculateSteamCubes(lavaCubes map[point]bool, gridBorder bounds) map[point]bool {
+	// do a bfs walk over the grid to find everywhere steam could go
+	expandedBorder := bounds{
+		addVector(gridBorder.min, vector{-1, -1, -1}),
+		addVector(gridBorder.max, vector{1, 1, 1}),
 	}
 
-	answer := map[point]bool{}
+	steamCubes := map[point]bool{}
 	toDoList := datastructures.Queue[point]{}
-	p := expanded.min
-	answer[p] = true
+	p := expandedBorder.min
+	steamCubes[p] = true
 	toDoList.Enqueue(p)
 
 	for !toDoList.IsEmpty() {
@@ -88,55 +88,47 @@ func calculateSteamCubes(lavaCubes map[point]bool, gridExtant extant) map[point]
 		for _, v := range adjacentVectors {
 			adjacent := addVector(p, v)
 
-			// if adjacent beyond border...
-			if adjacent.x > expanded.max.x || adjacent.y > expanded.max.y || adjacent.z > expanded.max.z {
+			// is adjacent beyond border?
+			if beyondBounds(adjacent, expandedBorder) {
 				continue
 			}
 
-			if adjacent.x < expanded.min.x || adjacent.y < expanded.min.y || adjacent.z < expanded.min.z {
-				continue
-			}
-
+			// is adjacent cube lava?
 			_, ok := lavaCubes[adjacent]
 			if ok {
-				// adjacent is lava
 				continue
 			}
 
-			_, ok = answer[adjacent]
+			// has adjacent cube been visited?
+			_, ok = steamCubes[adjacent]
 			if ok {
-				// adjacent has been visited
 				continue
 			}
 
-			answer[adjacent] = true
+			steamCubes[adjacent] = true
 			toDoList.Enqueue(adjacent)
 		}
 	}
 
-	return answer
+	return steamCubes
 }
 
-func parse(inputLines []string) (map[point]bool, extant) {
+func parse(inputLines []string) (map[point]bool, bounds) {
 	answer := map[point]bool{}
-	gridExtant := extant{}
+	gridBorder := bounds{}
 
 	p := parseInputLine(inputLines[0])
 	answer[p] = true
-	gridExtant.max.x = p.x
-	gridExtant.min.x = p.x
-	gridExtant.max.y = p.y
-	gridExtant.min.y = p.y
-	gridExtant.max.z = p.z
-	gridExtant.min.z = p.z
+	gridBorder.max = p
+	gridBorder.min = p
 
 	for i := 1; i < len(inputLines); i++ {
 		p = parseInputLine(inputLines[i])
-		gridExtant = updateGridExtant(p, gridExtant)
+		gridBorder = updateGridBorder(p, gridBorder)
 		answer[p] = true
 	}
 
-	return answer, gridExtant
+	return answer, gridBorder
 }
 
 func parseInputLine(inputLine string) point {
@@ -149,34 +141,47 @@ func parseInputLine(inputLine string) point {
 	return point{x, y, z}
 }
 
-func updateGridExtant(p point, gridExtant extant) extant {
-	if p.x > gridExtant.max.x {
-		gridExtant.max.x = p.x
+func updateGridBorder(p point, gridBorder bounds) bounds {
+	if p.x > gridBorder.max.x {
+		gridBorder.max.x = p.x
 	}
 
-	if p.x < gridExtant.min.x {
-		gridExtant.min.x = p.x
+	if p.x < gridBorder.min.x {
+		gridBorder.min.x = p.x
 	}
 
-	if p.y > gridExtant.max.y {
-		gridExtant.max.y = p.y
+	if p.y > gridBorder.max.y {
+		gridBorder.max.y = p.y
 	}
 
-	if p.y < gridExtant.min.y {
-		gridExtant.min.y = p.y
+	if p.y < gridBorder.min.y {
+		gridBorder.min.y = p.y
 	}
 
-	if p.z > gridExtant.max.z {
-		gridExtant.max.z = p.z
+	if p.z > gridBorder.max.z {
+		gridBorder.max.z = p.z
 	}
 
-	if p.z < gridExtant.min.z {
-		gridExtant.min.z = p.z
+	if p.z < gridBorder.min.z {
+		gridBorder.min.z = p.z
 	}
 
-	return gridExtant
+	return gridBorder
 }
 
 func addVector(p point, v vector) point {
 	return point{p.x + v.dx, p.y + v.dy, p.z + v.dz}
+}
+
+func beyondBounds(p point, b bounds) bool {
+	if p.x > b.max.x ||
+		p.x < b.min.x ||
+		p.y > b.max.y ||
+		p.y < b.min.y ||
+		p.z > b.max.z ||
+		p.z < b.min.z {
+		return true
+	}
+
+	return false
 }
