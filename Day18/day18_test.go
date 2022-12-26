@@ -24,3 +24,23 @@ func Test_Part1WithActualData(t *testing.T) {
 		t.Error("Expected 4400, got", answer)
 	}
 }
+
+func Test_Part2WithExampleData(t *testing.T) {
+	inputLines, _ := inputfile.Read("testdata/example.txt")
+
+	answer := part2(inputLines)
+
+	if answer != 58 {
+		t.Error("Expected 58, got", answer)
+	}
+}
+
+func Test_Part2WithActualData(t *testing.T) {
+	inputLines, _ := inputfile.Read("testdata/actual.txt")
+
+	answer := part2(inputLines)
+
+	if answer != 2522 {
+		t.Error("Expected 2522, got", answer)
+	}
+}
