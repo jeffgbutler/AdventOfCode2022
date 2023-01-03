@@ -9,25 +9,48 @@ type entry struct {
 }
 
 func part1(inputLines []string) int {
-	var mixedEntries []entry
+	var entries []entry
 
 	for i, inputLine := range inputLines {
-		mixedEntries = append(mixedEntries, entry{value: toInt(inputLine), initialIndex: i})
+		entries = append(entries, entry{value: toInt(inputLine), initialIndex: i})
 	}
 
-	for i := 0; i < len(inputLines); i++ {
-		mixIt(i, mixedEntries)
+	runTheMix(entries)
+
+	zeroIndex := findByValue(0, entries)
+
+	oneThousandIndex := (1000 + zeroIndex) % len(entries)
+	twoThousandIndex := (2000 + zeroIndex) % len(entries)
+	threeThousandIndex := (3000 + zeroIndex) % len(entries)
+
+	oneThousand := entries[oneThousandIndex]
+	twoThousand := entries[twoThousandIndex]
+	threeThousand := entries[threeThousandIndex]
+
+	return oneThousand.value + twoThousand.value + threeThousand.value
+}
+
+func part2(inputLines []string) int {
+	var entries []entry
+	const KEY = 811589153
+
+	for i, inputLine := range inputLines {
+		entries = append(entries, entry{value: toInt(inputLine) * KEY, initialIndex: i})
 	}
 
-	zeroIndex := findByValue(0, mixedEntries)
+	for i := 0; i < 10; i++ {
+		runTheMix(entries)
+	}
 
-	oneThousandIndex := (1000 + zeroIndex) % len(mixedEntries)
-	twoThousandIndex := (2000 + zeroIndex) % len(mixedEntries)
-	threeThousandIndex := (3000 + zeroIndex) % len(mixedEntries)
+	zeroIndex := findByValue(0, entries)
 
-	oneThousand := mixedEntries[oneThousandIndex]
-	twoThousand := mixedEntries[twoThousandIndex]
-	threeThousand := mixedEntries[threeThousandIndex]
+	oneThousandIndex := (1000 + zeroIndex) % len(entries)
+	twoThousandIndex := (2000 + zeroIndex) % len(entries)
+	threeThousandIndex := (3000 + zeroIndex) % len(entries)
+
+	oneThousand := entries[oneThousandIndex]
+	twoThousand := entries[twoThousandIndex]
+	threeThousand := entries[threeThousandIndex]
 
 	return oneThousand.value + twoThousand.value + threeThousand.value
 }
@@ -35,6 +58,12 @@ func part1(inputLines []string) int {
 func toInt(s string) int {
 	i, _ := strconv.Atoi(s)
 	return i
+}
+
+func runTheMix(entries []entry) {
+	for i := 0; i < len(entries); i++ {
+		mixIt(i, entries)
+	}
 }
 
 func mixIt(initialIndex int, entries []entry) {
