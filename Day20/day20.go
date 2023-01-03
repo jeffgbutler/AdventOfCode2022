@@ -4,30 +4,30 @@ import (
 	"strconv"
 )
 
-type s1 struct {
-	value, initialOrder int
+type entry struct {
+	value, initialIndex int
 }
 
 func part1(inputLines []string) int {
-	var mixedOrder []s1
+	var mixedEntries []entry
 
 	for i, inputLine := range inputLines {
-		mixedOrder = append(mixedOrder, s1{value: toInt(inputLine), initialOrder: i})
+		mixedEntries = append(mixedEntries, entry{value: toInt(inputLine), initialIndex: i})
 	}
 
 	for i := 0; i < len(inputLines); i++ {
-		mixIt(i, mixedOrder)
+		mixIt(i, mixedEntries)
 	}
 
-	zeroIndex := indexOf(0, mixedOrder)
+	zeroIndex := findByValue(0, mixedEntries)
 
-	oneThousandIndex := (1000 + zeroIndex) % len(mixedOrder)
-	twoThousandIndex := (2000 + zeroIndex) % len(mixedOrder)
-	threeThousandIndex := (3000 + zeroIndex) % len(mixedOrder)
+	oneThousandIndex := (1000 + zeroIndex) % len(mixedEntries)
+	twoThousandIndex := (2000 + zeroIndex) % len(mixedEntries)
+	threeThousandIndex := (3000 + zeroIndex) % len(mixedEntries)
 
-	oneThousand := mixedOrder[oneThousandIndex]
-	twoThousand := mixedOrder[twoThousandIndex]
-	threeThousand := mixedOrder[threeThousandIndex]
+	oneThousand := mixedEntries[oneThousandIndex]
+	twoThousand := mixedEntries[twoThousandIndex]
+	threeThousand := mixedEntries[threeThousandIndex]
 
 	return oneThousand.value + twoThousand.value + threeThousand.value
 }
@@ -37,13 +37,12 @@ func toInt(s string) int {
 	return i
 }
 
-func mixIt(initialIndex int, ints []s1) {
-	currentIndex := findIt(initialIndex, ints)
-	currentValue := ints[currentIndex]
-	val := currentValue.value
+func mixIt(initialIndex int, entries []entry) {
+	currentIndex := findByInitialIndex(initialIndex, entries)
+	currentEntry := entries[currentIndex]
 
-	slots := len(ints) - 1
-	moves := val % slots
+	slots := len(entries) - 1
+	moves := currentEntry.value % slots
 
 	if moves == 0 {
 		return
@@ -59,22 +58,17 @@ func mixIt(initialIndex int, ints []s1) {
 		return
 	}
 
-	// cut out val at index and shift higher values down
-	ints = append(ints[:currentIndex], ints[currentIndex+1:]...)
+	// cut out entry at index and shift higher entries down
+	entries = append(entries[:currentIndex], entries[currentIndex+1:]...)
 
-	// insert val at index
-	if newIndex == 0 && val < 0 {
-		ints = append(ints, currentValue)
-	} else {
-		ints = append(ints, s1{0, 0})
-		copy(ints[newIndex+1:], ints[newIndex:])
-		ints[newIndex] = currentValue
-	}
+	entries = append(entries, entry{0, 0})
+	copy(entries[newIndex+1:], entries[newIndex:])
+	entries[newIndex] = currentEntry
 }
 
-func findIt(initialIndex int, ints []s1) int {
-	for i := 0; i < len(ints); i++ {
-		if ints[i].initialOrder == initialIndex {
+func findByInitialIndex(initialIndex int, entries []entry) int {
+	for i := 0; i < len(entries); i++ {
+		if entries[i].initialIndex == initialIndex {
 			return i
 		}
 	}
@@ -82,10 +76,10 @@ func findIt(initialIndex int, ints []s1) int {
 	return -1
 }
 
-func indexOf(value int, intSlice []s1) int {
-	for index := 0; index < len(intSlice); index++ {
-		if intSlice[index].value == value {
-			return index
+func findByValue(value int, entries []entry) int {
+	for i := 0; i < len(entries); i++ {
+		if entries[i].value == value {
+			return i
 		}
 	}
 
